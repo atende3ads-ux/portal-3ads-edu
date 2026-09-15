@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
+import './styles/tokens.css';
+import './styles/base.css';
+
 export const metadata: Metadata = {
   title: 'Portal 3ADS EDU',
   description: 'Gestão e acompanhamento dos projetos educacionais da 3ADS.',

@@ -1,0 +1,330 @@
+/* Navegação lateral e cabeçalho. */
+
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.app[data-collapsed] {
+  grid-template-columns: var(--sidebar-width-collapsed) minmax(0, 1fr);
+}
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: var(--z-sidebar);
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  padding: var(--space-5) var(--space-3) var(--space-4);
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  transition: width var(--duration-base) var(--ease);
+}
+
+.app[data-collapsed] .sidebar {
+  width: var(--sidebar-width-collapsed);
+  padding-inline: var(--space-2);
+}
+
+.brand {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--touch-min);
+  margin-bottom: var(--space-5);
+}
+
+.brandName {
+  font-size: var(--text-strong);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.collapse {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+}
+
+.collapse:hover {
+  color: var(--accent-text);
+  border-color: var(--accent-text);
+}
+
+.nav {
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-min);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.navItem:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.navItem[data-active] {
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.app[data-collapsed] .navItem {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.app[data-collapsed] .navLabel {
+  /* Recolhido mostra a inicial; o rótulo completo vai no title. */
+  overflow: hidden;
+  width: 1ch;
+  white-space: nowrap;
+}
+
+.foot {
+  position: relative;
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.profile {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: var(--space-2);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+
+.profile:hover {
+  background: var(--surface-2);
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  background: var(--neutral-wash);
+  color: var(--accent-text);
+  border-radius: var(--radius-full);
+  font-size: var(--text-micro);
+  font-weight: 750;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileText {
+  min-width: 0;
+}
+
+.profileText strong {
+  display: block;
+  font-size: var(--text-body);
+  line-height: var(--leading-tight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileText small {
+  display: block;
+  color: var(--muted);
+  font-size: var(--text-micro);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app[data-collapsed] .profileText {
+  display: none;
+}
+
+.accountMenu {
+  position: absolute;
+  inset: auto var(--space-1) calc(100% + var(--space-1)) var(--space-1);
+  z-index: var(--z-drawer);
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.accountEmail {
+  padding: var(--space-1) var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-micro);
+  word-break: break-all;
+}
+
+.accountAction {
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: var(--space-2);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  text-align: left;
+}
+
+.accountAction:hover {
+  background: var(--surface-2);
+}
+
+.main {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.topbar {
+  display: none;
+}
+
+.content {
+  max-width: var(--content-max);
+  min-width: 0;
+  margin: 0 auto;
+  padding: var(--space-8) var(--content-pad-x) var(--space-16);
+}
+
+.scrim {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .content {
+    padding-inline: var(--space-5);
+  }
+}
+
+@media (max-width: 768px) {
+  .app,
+  .app[data-collapsed] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar,
+  .app[data-collapsed] .sidebar {
+    width: var(--sidebar-width);
+    padding-inline: var(--space-3);
+    transform: translateX(-101%);
+    visibility: hidden;
+    transition: transform var(--duration-base) var(--ease), visibility 0s var(--duration-base);
+  }
+
+  .sidebar[data-open] {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--duration-base) var(--ease), visibility 0s;
+  }
+
+  /* No celular o menu sempre aparece expandido, ainda que recolhido no desktop. */
+  .app[data-collapsed] .navItem {
+    justify-content: flex-start;
+    padding-inline: var(--space-3);
+  }
+
+  .app[data-collapsed] .navLabel {
+    width: auto;
+  }
+
+  .app[data-collapsed] .profileText {
+    display: block;
+  }
+
+  .main {
+    grid-column: 1;
+  }
+
+  .collapse {
+    display: none;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-topbar);
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    height: var(--topbar-height);
+    padding-inline: var(--space-4);
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .topbarBrand {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .menuButton {
+    display: grid;
+    place-items: center;
+    width: var(--touch-min);
+    height: var(--touch-min);
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    color: var(--ink);
+  }
+
+  .content {
+    padding: var(--space-5) var(--content-pad-x-mobile) var(--space-12);
+  }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-scrim);
+    display: block;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-base) var(--ease);
+  }
+
+  .scrim[data-open] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sidebar {
+    z-index: calc(var(--z-scrim) + 1);
+  }
+}

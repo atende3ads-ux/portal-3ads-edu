@@ -77,7 +77,8 @@ Cinco decisões continuam marcadas como “Proposto” no [doc 12](docs/12-decis
 | Etapa | Situação |
 |---|---|
 | E1 · Acesso e identidade | Concluída — [doc 17](docs/17-aplicacao.md) |
-| E2 a E12 | A construir, na ordem do [doc 13](docs/13-escopo-v1.md) |
+| E2 · Projetos | Concluída — [doc 17](docs/17-aplicacao.md) |
+| E3 a E12 | A construir, na ordem do [doc 13](docs/13-escopo-v1.md) |
 
 ## Execução local
 

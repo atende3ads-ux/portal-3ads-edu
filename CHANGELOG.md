@@ -1,5 +1,53 @@
 # Registro de mudanças
 
+## 2026-09-15 · Fase 1 · E2 · Projetos
+
+### Telas
+
+Primeiras telas da versão produtiva, construídas sobre os tokens auditados
+do `docs/11` — WCAG AA, foco visível, Escape e alvos de 40 px desde o
+início, não como correção posterior.
+
+- navegação lateral recolhível com preferência persistida, menu de conta e
+  sobreposição no celular;
+- lista de projetos com recorte por perfil;
+- **detalhe do projeto nas três visões**, em uma rota só: escopo, etapas,
+  progresso, pessoas, atividades, materiais e atualizações, cada perfil
+  vendo o que lhe cabe.
+
+### API
+
+- membros: listar, adicionar, alterar papel e permissões, remover;
+- etapas do projeto, com reordenação em bloco;
+- ciclo de vida do D-008, com os impedimentos de encerramento nomeados;
+- indicadores consolidados por perfil;
+- criação e listagem de atividades — fronteira com E3, necessária para o
+  critério de pronto do E2.
+
+### Critério de pronto do E2
+
+Um projeto criado inteiramente pela API — projeto, etapas, pessoas,
+ativação e atividades — exibe escopo, pessoas, progresso e próximos passos
+corretamente nas três visões, verificado no HTML renderizado. Nenhum dado
+inserido manualmente no banco.
+
+### Decisões de interface
+
+- **o rótulo do estado muda conforme quem lê**: `waiting_client` é
+  "Aguardando cliente" para a equipe e "Aguardando você" para o cliente;
+- **o cliente não vê horas em análise**: o consumo de escopo usa apenas
+  horas aprovadas, para não oscilar quando uma for rejeitada.
+
+### Defeitos encontrados na revisão visual
+
+- o indicador de etapa transbordava e colidia com o vizinho quando o nome
+  era longo;
+- o estado `waiting_client` aparecia como "Aguardando você" para o Admin.
+
+### Verificação
+
+`npm run verify`: **163 verificações**, todas passando.
+
 ## 2026-09-15 · Fase 1 · E1 · Acesso e identidade
 
 ### Aplicação

@@ -52,4 +52,9 @@ if ! curl -fsS -o /dev/null "${BASE_URL}/entrar" 2>/dev/null; then
 fi
 
 echo "→ executando a suíte"
-NODE_ENV=test BASE_URL="$BASE_URL" node --env-file=.env --import tsx --test tests/server/api-e1.test.ts
+# Os arquivos rodam em sequência: cada um limpa o banco no seu `before`,
+# e rodar em paralelo faria um apagar a massa do outro.
+NODE_ENV=test BASE_URL="$BASE_URL" node --env-file=.env --import tsx --test \
+  --test-concurrency=1 \
+  tests/server/api-e1.test.ts \
+  tests/server/api-e2.test.ts

@@ -1,0 +1,168 @@
+/* =========================================================================
+   Portal 3ADS EDU — Tokens de design
+   Fase 0 · fonte única de verdade para cor, tipografia, espaço e layout.
+
+   Substitui os blocos :root duplicados e divergentes de outputs/portal.css
+   e outputs/index.html. Toda a paleta foi auditada contra WCAG AA
+   (4.5:1 para texto normal, 3:1 para texto grande e componentes de UI).
+
+   Ver docs/11-tokens-de-design.md para a auditoria completa.
+   ========================================================================= */
+
+:root {
+  /* ---------- Marca ---------- */
+  --edu-blue-500: #007cff;   /* azul 3ADS — identidade, preenchimentos grandes */
+  --edu-blue-600: #0072eb;   /* azul de botão — 4.56:1 com texto branco */
+  --edu-blue-700: #0068d6;   /* azul de texto no tema claro — 4.58:1 */
+
+  /* ---------- Superfícies ---------- */
+  --bg: #f4f5f8;
+  --surface: #ffffff;
+  --surface-2: #eceef2;
+  --hover: #f7f9fc;
+  --line: #dde0e6;
+  --bluewash: #e7f2ff;
+
+  /* ---------- Texto ---------- */
+  --ink: #0a0b0e;      /* 19.68:1 sobre --surface */
+  --muted: #656a73;    /* 4.68:1 no pior fundo — texto secundário */
+  --soft: #666c76;     /* 4.55:1 no pior fundo — metadados, 11px */
+  --on-accent: #ffffff;
+
+  /* ---------- Ação ---------- */
+  --accent: var(--edu-blue-500);        /* preenchimento, barras, ícones */
+  --accent-strong: var(--edu-blue-600); /* fundo de botão primário */
+  --accent-text: var(--edu-blue-700);   /* links e rótulos em texto */
+
+  /* ---------- Estados semânticos ---------- */
+  --positive: #10795d;   /* concluído, aprovado, publicado, ativo */
+  --neutral: var(--edu-blue-700);
+  --warning: #a15808;    /* pendente, aguardando, próximo do prazo */
+  --danger: #be3838;     /* atrasado, bloqueado, rejeitado, erro */
+
+  --positive-wash: color-mix(in srgb, var(--positive) 10%, transparent);
+  --warning-wash: color-mix(in srgb, var(--warning) 11%, transparent);
+  --danger-wash: color-mix(in srgb, var(--danger) 10%, transparent);
+  --neutral-wash: var(--bluewash);
+
+  /* ---------- Elevação ---------- */
+  --shadow-sm: 0 5px 16px rgba(17, 24, 39, .06);
+  --shadow-md: 0 16px 45px rgba(17, 24, 39, .08);
+  --shadow-lg: 0 20px 60px rgba(17, 24, 39, .14);
+
+  /* ---------- Tipografia ---------- */
+  --font-sans: "Geist", "Inter", "Helvetica Neue", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+
+  --text-micro: 11px;   /* piso absoluto — rótulos, status, eyebrow */
+  --text-body: 12px;    /* corpo padrão */
+  --text-strong: 14px;  /* títulos de item, nomes, valores em destaque */
+  --text-h3: 16px;      /* títulos de seção e de painel */
+  --text-h2: 20px;
+  --text-stat: 24px;    /* indicadores do portal do cliente */
+  --text-metric: 26px;  /* indicadores de Admin e Professor */
+  --text-h1: clamp(30px, 3vw, 40px);          /* título de página */
+  --text-display: clamp(36px, 4vw, 46px);     /* título do projeto */
+
+  --leading-tight: 1.25;
+  --leading-body: 1.5;   /* piso de 1,4 exigido pelo doc 06 */
+  --leading-loose: 1.6;
+
+  --tracking-eyebrow: .14em;
+  --tracking-h1: -.045em;
+  --tracking-display: -.055em;
+
+  /* ---------- Espaçamento (escala base 4) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ---------- Raio ---------- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-full: 999px;
+
+  /* ---------- Layout ---------- */
+  --sidebar-width: 224px;
+  --sidebar-width-collapsed: 72px;
+  --topbar-height: 58px;
+  --content-max: 1280px;
+  --content-pad-x: var(--space-8);
+  --content-pad-x-mobile: var(--space-4);
+
+  /* ---------- Alvos de interação ---------- */
+  --touch-min: 40px;          /* exigência do doc 06 */
+  --icon-sm: 15px;
+  --icon-md: 18px;
+  --icon-lg: 24px;
+
+  /* ---------- Movimento ---------- */
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 280ms;
+
+  /* ---------- Foco ---------- */
+  --focus-ring: 2px solid var(--accent-text);
+  --focus-offset: 2px;
+
+  /* ---------- Camadas ---------- */
+  --z-sidebar: 20;
+  --z-topbar: 15;
+  --z-scrim: 30;
+  --z-drawer: 31;
+  --z-toast: 50;
+  --z-modal: 100;
+}
+
+/* =========================================================================
+   Tema escuro
+   Cada cor foi reclareada até passar AA contra --bg, --surface e --surface-2.
+   ========================================================================= */
+
+:root[data-theme="dark"] {
+  --bg: #030305;
+  --surface: #0d0f13;
+  --surface-2: #171a20;
+  --hover: #13161c;
+  --line: #242832;
+  --bluewash: #081d36;
+
+  --ink: #f7f8fa;
+  --muted: #a4aab4;    /* 7.46:1 no pior fundo */
+  --soft: #7c828d;     /* 4.51:1 no pior fundo */
+
+  --accent: var(--edu-blue-500);
+  --accent-strong: var(--edu-blue-600);
+  --accent-text: #057fff;   /* 4.55:1 no pior fundo */
+
+  --positive: #139472;
+  --neutral: #057fff;
+  --warning: #c36b09;
+  --danger: #d05e5e;
+
+  --shadow-sm: 0 5px 16px rgba(0, 0, 0, .45);
+  --shadow-md: 0 16px 45px rgba(0, 0, 0, .45);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, .55);
+}
+
+/* =========================================================================
+   Preferências do sistema
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 1ms;
+    --duration-base: 1ms;
+    --duration-slow: 1ms;
+  }
+}

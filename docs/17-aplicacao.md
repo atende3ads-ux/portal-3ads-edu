@@ -1,6 +1,6 @@
 # Aplicação
 
-> Estado da Fase 1. Cobre a etapa **E1 · Acesso e identidade** de [`13-escopo-v1.md`](13-escopo-v1.md).
+> Estado da Fase 1. Cobre as etapas **E1 · Acesso e identidade** e **E2 · Projetos** de [`13-escopo-v1.md`](13-escopo-v1.md).
 
 ## Stack
 
@@ -25,7 +25,13 @@ src/
   auth.ts                ponto de entrada do Auth.js
   app/
     api/v1/              rotas do contrato do doc 10
+    (portal)/            áreas autenticadas
+      projetos/          lista e detalhe nas três visões
     entrar/              tela de acesso
+    styles/              tokens e base
+  components/
+    ui.tsx               componentes do inventário do doc 11
+    shell.tsx            navegação lateral e cabeçalho
   server/
     db.ts                cliente Prisma
     audit.ts             trilha de auditoria
@@ -101,6 +107,37 @@ O endereço de origem nunca é gravado em claro. O hash com sal fixo permite cor
 
 Toda negativa de autorização é registrada pelo envoltório `route`, sem que cada rota precise lembrar.
 
+## As três visões
+
+A rota `/projetos/[id]` serve os três perfis. É a tradução direta do doc 01: "não são três ferramentas separadas, mas três visões da mesma operação".
+
+| | Admin e Operação | Professor | Cliente |
+|---|---|---|---|
+| Escopo, período, etapas | ● | ● | ● |
+| Pessoas envolvidas | ● | ● | ● |
+| Progresso | ● | ● | ● |
+| Atividades | ● | ● | ● ponto focal |
+| Próximos passos | ● | ● | — |
+| Pendências da operação | ● | — | — |
+| O que aguarda o cliente | — | — | ● em destaque |
+| Consumo de horas | ● | próprias | — |
+| Observações internas | ● | — | — |
+| Materiais não publicados | ● | — | — |
+
+Duas decisões de interface que vieram do produto, não do código:
+
+**O rótulo do estado muda conforme quem lê.** `waiting_client` é "Aguardando cliente" para a equipe e "Aguardando você" para o cliente. O doc 06 exige que o estado venha sempre acompanhado de texto; o texto precisa ser o certo para quem está lendo.
+
+**O cliente não vê horas em análise.** O D-004 sujeita a hora de parceiro externo a aprovação, e mostrar horas ainda não aprovadas faria o consumo de escopo oscilar para baixo quando uma fosse rejeitada. Número instável destrói a confiança de quem acompanha — que é justamente o que o portal do Cliente existe para construir.
+
+## Ciclo de vida do projeto
+
+Implementa o D-008. As transições ficam em `src/server/projects/lifecycle.ts`.
+
+Encerrar exige que não haja timer em execução, hora pendente de aprovação nem atividade em aberto. A última condição é deliberada: encerrar um projeto com tarefa em aberto esconde trabalho que ficou por fazer, que é o oposto do que o portal existe para resolver. Quando a transição é recusada, a resposta nomeia cada impedimento.
+
+Remover uma pessoa encerra o vínculo e nada mais. O doc 02 é explícito: "a remoção de acesso não deve apagar o histórico produzido pelo usuário" — as atividades, horas e atualizações dela permanecem no projeto.
+
 ## Verificação
 
 ```
@@ -113,7 +150,7 @@ npm run verify
 | `verify:tokens` | 46 pares de contraste, sincronia dos tokens |
 | `test:prototype` | 44 checagens de navegador no protótipo |
 | `test:authz` | 39 testes de autorização contra banco real |
-| `test:e2e` | 15 testes de ponta a ponta com servidor e sessão |
+| `test:e2e` | 34 testes de ponta a ponta com servidor e sessão |
 
 Os testes de autorização rodam contra banco real, não mocks: a regra envolve consulta, e mock de consulta testa o mock. Eles foram submetidos a teste de mutação — trocar o 404 por 403 derruba 3 testes; fazer a concessão indevida valer derruba 2.
 
@@ -131,15 +168,35 @@ npm run dev
 
 ## O que falta na Fase 1
 
-E1 está completo. Segue a ordem de [`13-escopo-v1.md`](13-escopo-v1.md):
+E1 e E2 estão completos. Segue a ordem de [`13-escopo-v1.md`](13-escopo-v1.md):
 
 | Etapa | Entrega |
 |---|---|
-| 2 | E2 · Projetos e membros — telas, gestão de vínculos, ciclo de vida |
 | 3 | E3 · Atividades · E4 · Horas |
 | 4 | E5 · Materiais · E6 · Atualizações |
 | 5 | E9 · Dashboards · E7 · Mural · E8 · Feedbacks |
 | 6 | E10 · Notificações |
 | 7 | E11 e E12 · Base técnica e qualidade |
 
-As rotas de `/api/v1` implementadas até aqui são `/me`, `/projects` e `/projects/{id}`. O restante do contrato do doc 10 acompanha as etapas correspondentes.
+### Rotas implementadas
+
+| Rota | Etapa |
+|---|---|
+| `GET/PATCH /me` | E1 |
+| `GET/POST /projects` | E2 |
+| `GET/PATCH /projects/{id}` | E2 |
+| `GET/POST /projects/{id}/members` | E2 |
+| `PATCH/DELETE /projects/{id}/members/{userId}` | E2 |
+| `GET/PUT /projects/{id}/stages` | E2 |
+| `GET /projects/{id}/summary` | E2 |
+| `POST /projects/{id}/status` | E2 |
+| `POST /projects/{id}/archive` | E2 |
+| `GET/POST /projects/{id}/activities` | E2 · fronteira com E3 |
+
+A criação de atividades entrou em E2 porque sem ela o critério de pronto não era verificável: "próximos passos" e "aguardando você" saem de atividades. O restante de E3 — timer, conclusão, histórico por atividade — vem na etapa seguinte.
+
+### Pendências conhecidas
+
+- O cadastro de organizações ainda não tem tela nem rota: hoje um projeto novo exige uma organização cliente já existente.
+- A tela de cadastro de projeto e a de gestão de pessoas existem apenas como API; o Admin ainda opera por requisição.
+- Os itens de navegação das etapas futuras não aparecem no menu, para não prometer o que não há.
