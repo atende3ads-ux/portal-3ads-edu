@@ -1,0 +1,80 @@
+/* =========================================================================
+   Portal 3ADS EDU — tokens do protótipo
+
+   Declaração ÚNICA da paleta. Substitui os blocos :root que antes existiam
+   duplicados e divergentes em portal.css e no <style> de index.html.
+
+   Todos os valores foram auditados contra WCAG AA. Ver a auditoria completa
+   em docs/11-tokens-de-design.md e a fonte de verdade da v1 em
+   design/tokens.css — este arquivo mantém os nomes legados usados pelo
+   protótipo para não exigir reescrita das folhas de estilo existentes.
+
+   Carregue-o ANTES de portal.css e typography.css.
+   ========================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* Superfícies */
+  --bg: #f4f5f8;
+  --surface: #ffffff;
+  --surface2: #eceef2;
+  --hover: #f7f9fc;
+  --line: #dde0e6;
+  --bluewash: #e7f2ff;
+
+  /* Texto */
+  --ink: #0a0b0e;     /* 19.68:1 sobre --surface */
+  --muted: #656a73;   /* 4.68:1 no pior fundo */
+  --soft: #666c76;    /* 4.55:1 no pior fundo — era #969ba4, com 2.40:1 */
+
+  /* Azul 3ADS
+     --blue       texto, ícone e borda        — precisa de 4.5:1
+     --blue-fill  fundo com texto branco      — precisa de 4.5:1 com #fff
+     O azul de marca #007cff não atende a nenhum dos dois como texto;
+     permanece disponível em --blue-brand para preenchimentos decorativos. */
+  --blue-brand: #007cff;
+  --blue: #0068d6;
+  --blue-fill: #0072eb;
+
+  /* Estados semânticos */
+  --green: #10795d;
+  --amber: #a15808;
+  --red: #be3838;
+
+  /* Elevação */
+  --shadow: 0 16px 45px rgba(17, 24, 39, .08);
+
+  /* Interação */
+  --touch-min: 40px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* Movimento */
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #030305;
+  --surface: #0d0f13;
+  --surface2: #171a20;
+  --hover: #13161c;
+  --line: #242832;
+  --bluewash: #06182c;   /* era #081d36: 4.43:1 com o azul, abaixo do mínimo */
+
+  --ink: #f7f8fa;
+  --muted: #a4aab4;
+  --soft: #7c828d;       /* era #717781, com 3.87:1 */
+
+  --blue: #057fff;
+  --blue-fill: #0072eb;
+
+  --green: #139472;
+  --amber: #c36b09;
+  --red: #d05e5e;
+
+  --shadow: 0 16px 45px rgba(0, 0, 0, .45);
+}

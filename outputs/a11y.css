@@ -1,0 +1,271 @@
+/* =========================================================================
+   Portal 3ADS EDU — correções de acessibilidade e layout do protótipo
+
+   Implementa exigências do doc 06 que o protótipo não atendia e corrige um
+   defeito de responsividade do portal do Cliente.
+
+   Carregue por ÚLTIMO, depois de portal.css e typography.css: estas regras
+   precisam sobrescrever as folhas existentes.
+
+   Ver docs/11-tokens-de-design.md.
+   ========================================================================= */
+
+/* =========================================================================
+   Acessibilidade — exigências do doc 06 que o protótipo não implementava
+   ========================================================================= */
+
+/* Foco visível em toda ação. Antes existiam apenas duas regras
+   :focus-visible, restritas a .card-interactive e .interactive-row. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: var(--focus-ring-width) solid var(--blue);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: 4px;
+}
+
+/* O contorno não pode ficar recortado pela borda do container. */
+.nav button:focus-visible,
+.side-nav .nav-btn:focus-visible,
+.activity:focus-visible,
+.project-row:focus-visible,
+.group-head:focus-visible {
+  outline-offset: -2px;
+}
+
+/* Alvos de toque de 40 x 40 px. No protótipo: 30x30 nas notas de avaliação,
+   32x32 nas ações de pessoa e 28x28 no botão de recolher o menu. */
+.rating-buttons button,
+.person-actions button,
+.sidebar-collapse,
+.tool-btn,
+.modal-close,
+.close,
+.menu,
+.mobile-menu {
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+}
+
+.rating-buttons button {
+  width: var(--touch-min);
+  height: var(--touch-min);
+}
+
+/* O botão de recolher fica em espaço apertado: mantém o alvo sem inchar
+   a caixa visível. */
+.sidebar-collapse {
+  position: relative;
+}
+.sidebar-collapse::after {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  transform: translate(-50%, -50%);
+}
+
+/* Diálogos precisam rolar em telas baixas sem cortar o rodapé. */
+.timer-modal-back {
+  overscroll-behavior: contain;
+}
+
+/* prefers-reduced-motion: nenhuma ocorrência no protótipo, embora o doc 06
+   exija respeito à preferência. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 1ms;
+    --duration-base: 1ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================================
+   Correção de responsividade — portal do Cliente
+
+   Defeito pré-existente: em 390 px o conteúdo estourava 161 px para fora da
+   tela, contrariando o doc 07, que exige funcionamento em 1440, 1024, 768,
+   390 e 320 px.
+
+   Causa: a coluna `1fr` de `.app` usa `min-width: auto`, então o min-content
+   do conteúdo empurra o grid. A `.viewbar` — a fila de chips "Todas / Minha
+   atenção / Em andamento / Próximas / Concluídas" — tem 515 px de
+   min-content e arrastava a página inteira junto.
+
+   Correção: zerar a largura mínima na cadeia do grid. Os contêineres que
+   precisam transbordar (chips, tabelas, barras de ferramentas) fazem isso
+   dentro da própria caixa, com rolagem horizontal própria.
+   ========================================================================= */
+
+.app > .main,
+.main > .content,
+.content > .page {
+  min-width: 0;
+}
+
+.viewbar,
+.entity-toolbar,
+.filters,
+.tabs {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Rolagem horizontal é aceitável apenas dentro de tabelas, diagramas e
+   blocos de código — nunca no corpo da página. */
+.table-wrap,
+.drawer-tab-content {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+/* Títulos longos não podem forçar a largura da página. */
+h1,
+.page-head h1,
+.project-head h1,
+.page-title {
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+/* =========================================================================
+   Painel lateral fechado
+
+   O drawer é escondido com `transform: translateX(101%)`. Transform não
+   altera o layout, mas o elemento continua na área de rolagem — daí a barra
+   horizontal que aparecia em várias larguras, mesmo sem conteúdo estourando.
+
+   Há também um problema de acessibilidade: um drawer apenas deslocado
+   continua no fluxo de leitura e na ordem de tabulação, então leitor de tela
+   e teclado alcançavam um painel invisível. `visibility: hidden` resolve os
+   dois — remove da árvore de acessibilidade e do foco.
+   ========================================================================= */
+
+.drawer:not(.open) {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.drawer {
+  transition: transform var(--duration-slow, 280ms) var(--ease, cubic-bezier(.2, .8, .2, 1)),
+              visibility var(--duration-slow, 280ms);
+}
+
+/* `clip` (e não `hidden`) corta sem criar um contêiner de rolagem: impede a
+   barra horizontal espúria sem afetar a rolagem vertical da página. */
+html {
+  overflow-x: clip;
+}
+
+/* =========================================================================
+   Tabelas
+
+   `.table` recebe `min-width: 560px` abaixo de 560 px de viewport, o que só
+   funciona dentro de um contêiner com rolagem própria. No Admin as tabelas
+   estão em `.panel.table-wrap`; no Professor, a tabela de próximas aulas
+   estava em um `.panel` simples e estourava a página.
+
+   A regra abaixo cobre qualquer painel com tabela, inclusive os que venham
+   a ser adicionados sem a classe.
+   ========================================================================= */
+
+.panel:has(> .table),
+.panel:has(> table) {
+  overflow-x: auto;
+}
+
+/* =========================================================================
+   Breakpoint intermediário
+
+   O protótipo só tem dois cortes: 900 px e 560 px. O doc 06 pede que o
+   tablet "reduza colunas sem reduzir legibilidade", e o doc 07 exige
+   verificação em 1024 px — largura em que o layout de duas colunas do
+   dashboard estourava 92 px para fora da tela.
+
+   Causa: `.grid` usa `1.5fr .8fr`, e `1fr` tem `min-width: auto`. As linhas
+   de projeto somam 650 px de largura mínima (seis colunas mais os vãos),
+   então a primeira coluna se recusava a encolher e empurrava a segunda
+   para fora.
+   ========================================================================= */
+
+.grid {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, .8fr);
+}
+
+.project-row,
+.panel,
+.metrics {
+  min-width: 0;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* O painel lateral precisa ficar visível assim que abre; só o fechamento
+   espera a transição terminar. Sem isso, o foco não entra no drawer,
+   porque um elemento com `visibility: hidden` não é focável. */
+.drawer.open {
+  transition: transform var(--duration-slow, 280ms) var(--ease, cubic-bezier(.2, .8, .2, 1)),
+              visibility 0s;
+}
+
+.drawer:not(.open) {
+  transition: transform var(--duration-slow, 280ms) var(--ease, cubic-bezier(.2, .8, .2, 1)),
+              visibility 0s var(--duration-slow, 280ms);
+}
+
+/* =========================================================================
+   Barra de filtros do portal do Cliente
+
+   `.toolbar` era um grid de oito colunas rígidas
+   (`minmax(230px,1fr) repeat(4,auto) auto auto`), que não cabiam em 1024 px
+   nem em 320 px. Abaixo de 900 px o protótipo resolvia escondendo metade
+   dos filtros — o que contraria o doc 03, que prevê "buscar, filtrar e
+   agrupar" no portal do Cliente, sem ressalva por tamanho de tela.
+
+   Em vez de esconder, deixamos a barra quebrar em linhas: todos os filtros
+   permanecem acessíveis em qualquer largura.
+   ========================================================================= */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar .searchbox {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.toolbar .select,
+.toolbar .tool-btn,
+.toolbar .clear {
+  flex: 0 0 auto;
+}
+
+.toolbar .select {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Com a quebra em linhas, os filtros deixam de precisar sumir no celular. */
+@media (max-width: 900px) {
+  .toolbar .select:nth-of-type(n+3),
+  .toolbar .clear {
+    display: initial;
+  }
+}

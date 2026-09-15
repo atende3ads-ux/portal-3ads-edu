@@ -1,0 +1,19 @@
+{
+  "name": "portal-3ads-edu",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portal de gestao e acompanhamento dos projetos educacionais da 3ADS EDU",
+  "type": "module",
+  "scripts": {
+    "verify:tokens": "node design/verify-tokens.mjs",
+    "test:prototype": "node tests/prototype-a11y.mjs",
+    "verify": "npm run verify:tokens && npm run test:prototype",
+    "serve": "npx --yes serve outputs"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

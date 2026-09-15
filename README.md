@@ -16,11 +16,20 @@ Protótipo navegável do portal de gestão e acompanhamento dos projetos educaci
 | Professor | [`outputs/trainer.html`](outputs/trainer.html) |
 | Cliente | [`outputs/index.html`](outputs/index.html) |
 
-Os arquivos podem ser abertos diretamente no navegador ou servidos por um servidor HTTP estático.
+Os arquivos podem ser abertos diretamente no navegador ou servidos com `npm run serve`.
 
 ## Documentação
 
-A documentação completa começa em [`DOCUMENTACAO.md`](DOCUMENTACAO.md). Ela inclui produto, permissões, fluxos, arquitetura, dados, UX, testes, roadmap, guia de uso e contrato inicial de API.
+A documentação completa começa em [`DOCUMENTACAO.md`](DOCUMENTACAO.md). Ela inclui produto, permissões, fluxos, arquitetura, dados, UX, testes, roadmap, guia de uso e contrato inicial de API, além dos entregáveis da Fase 0: tokens de design, decisões técnicas, escopo da v1, matriz de permissões validada, política de retenção e roteiro de validação.
+
+## Verificação
+
+```
+npm install
+npm run verify
+```
+
+Confere o contraste da paleta contra WCAG AA, a sincronia dos tokens e o comportamento do protótipo nas cinco larguras exigidas pelo plano de testes.
 
 ## Estado do projeto
 
@@ -34,6 +43,8 @@ A versão produtiva ainda precisará de backend, banco de dados, autenticação,
 - CSS3;
 - JavaScript sem framework;
 - armazenamento demonstrativo no navegador.
+
+A stack da versão produtiva está decidida em [`docs/12-decisoes-tecnicas.md`](docs/12-decisoes-tecnicas.md): Next.js full-stack, Prisma sobre PostgreSQL, Auth.js e armazenamento compatível com S3.
 
 ## Uso e confidencialidade
 

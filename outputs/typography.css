@@ -129,7 +129,7 @@ body { font-size: 12px; line-height: 1.5; }
 .rating-buttons { display: flex; flex-wrap: wrap; gap: 5px; }
 .rating-buttons button { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); color: var(--muted); cursor: pointer; }
 .rating-buttons button:hover,
-.rating-buttons button.active { color: #fff; border-color: var(--blue); background: var(--blue); }
+.rating-buttons button.active { color: #fff; border-color: var(--blue-fill); background: var(--blue-fill); }
 
 /* Piso de legibilidade para toda a aplicação */
 .app :where(p, span, small, strong, time, button, input, select, textarea, option, a, label, td, th) {
