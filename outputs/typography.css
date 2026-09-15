@@ -1,0 +1,394 @@
+/* Escala tipográfica de aplicação — legibilidade padrão */
+body { font-size: 12px; line-height: 1.5; }
+
+.page-head h1 { font-size: 38px; }
+
+.page-head p,
+.profile span,
+.global-search,
+.role-switch a,
+.role-switch span,
+.nav button,
+.foot button,
+.metric span,
+.feed-item p,
+.feed-item small,
+.project-row p,
+.project-row span,
+.notice p,
+.field input,
+.field textarea,
+.field select,
+.select,
+.search,
+.table td,
+.timer small { font-size: 12px; }
+
+.panel-head h2,
+.panel h2,
+.section-head h2 { font-size: 16px; }
+
+.project-row h3,
+.feed-item strong,
+.notice strong,
+.timer strong,
+.profile strong { font-size: 14px; }
+
+.table th,
+.field label,
+.eyebrow,
+.status,
+.toggle,
+.btn,
+.text-btn,
+.panel-head a { font-size: 11px; }
+
+.metric strong { font-size: 26px; }
+.nav button { padding-block: 11px; }
+.table td { padding-block: 13px; }
+.project-row { padding-block: 15px; }
+
+@media (max-width: 560px) {
+  body { font-size: 12px; }
+  .page-head h1 { font-size: 34px; }
+  .panel-head h2,
+  .panel h2 { font-size: 16px; }
+}
+
+/* Iconografia e componentes interativos compartilhados */
+.ui-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.nav button .ui-icon { color: currentColor; }
+.nav button span { min-width: 0; }
+.global-search .ui-icon { width: 16px; height: 16px; }
+.btn.primary,
+.timer > button,
+.modal-start { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.btn .ui-icon,
+.timer button .ui-icon { width: 15px; height: 15px; }
+.menu-lines { display: grid; gap: 4px; width: 18px; }
+.menu-lines i { display: block; height: 1.5px; width: 18px; background: currentColor; border-radius: 2px; }
+.upload { cursor: pointer; display: grid; justify-items: center; gap: 6px; transition: border-color .2s, background .2s; }
+.upload:hover { border-color: var(--blue); background: var(--bluewash); }
+.upload .ui-icon { width: 24px; height: 24px; color: var(--blue); }
+.upload strong { font-size: 12px; }
+.upload span { font-size: 11px; color: var(--soft); }
+
+.timer-modal-back {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0,0,0,.52);
+  backdrop-filter: blur(5px);
+}
+.timer-modal {
+  width: min(520px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  animation: timerEnter .22s ease both;
+}
+@keyframes timerEnter { from { opacity: 0; transform: translateY(12px) scale(.98); } }
+.timer-modal header,
+.timer-modal footer { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.timer-modal header > div { display: flex; align-items: center; gap: 12px; }
+.timer-modal header > div > .ui-icon { width: 28px; height: 28px; color: var(--blue); }
+.timer-modal header h2 { margin: 2px 0 0; font-size: 18px; }
+.timer-modal footer { border-top: 1px solid var(--line); border-bottom: 0; justify-content: flex-end; gap: 8px; }
+.timer-modal-body { display: grid; gap: 14px; padding: 20px; }
+.timer-modal .field label { font-size: 11px; }
+.timer-modal .field input,
+.timer-modal .field select,
+.timer-modal .field textarea { font-size: 12px; min-height: auto; }
+.timer-modal .field textarea { min-height: 76px; }
+.modal-close { border: 0; background: none; color: var(--muted); font-size: 24px; cursor: pointer; }
+.timer-error { min-height: 18px; color: var(--red); font-size: 11px; }
+.timer > button.running { background: #d84343; }
+
+@media (max-width: 560px) {
+  .timer-modal-back { align-items: end; padding: 0; }
+  .timer-modal { width: 100%; max-height: 92vh; border-radius: 16px 16px 0 0; }
+}
+
+.client-rating { margin: 14px 0; }
+.client-rating > label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 12px; }
+.rating-buttons { display: flex; flex-wrap: wrap; gap: 5px; }
+.rating-buttons button { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); color: var(--muted); cursor: pointer; }
+.rating-buttons button:hover,
+.rating-buttons button.active { color: #fff; border-color: var(--blue); background: var(--blue); }
+
+/* Piso de legibilidade para toda a aplicação */
+.app :where(p, span, small, strong, time, button, input, select, textarea, option, a, label, td, th) {
+  font-size: max(11px, 1em);
+}
+.tabs button { font-size: 12px; padding: 11px 13px; cursor: pointer; }
+.drawer .feed-item strong { font-size: 14px; }
+.drawer .feed-item p,
+.drawer .feed-item small { font-size: 12px; }
+.drawer-tab-content { min-height: 300px; }
+.drawer-tab-content[aria-busy="true"] { opacity: .55; }
+.drawer-list-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.drawer-list-row:first-child { border-top: 0; }
+.drawer-list-row > .ui-icon { color: var(--blue); }
+.drawer-list-row strong { display: block; font-size: 14px; }
+.drawer-list-row p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+.drawer-list-row .btn { font-size: 11px; }
+.person-compact { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+.person-compact:first-child { border-top: 0; }
+.person-compact .avatar { margin: 0; flex: 0 0 40px; }
+.person-compact strong { display: block; font-size: 14px; }
+.person-compact span { color: var(--muted); font-size: 12px; }
+
+/* Sistema de navegação, estados e mídia */
+.sidebar-collapse {
+  position: absolute;
+  top: 28px;
+  right: -13px;
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  box-shadow: 0 5px 16px rgba(0,0,0,.08);
+  z-index: 4;
+}
+.sidebar-collapse:hover { color: var(--blue); border-color: var(--blue); }
+.sidebar-collapse .ui-icon { width: 15px; height: 15px; }
+.app.sidebar-collapsed { grid-template-columns: 72px 1fr; }
+.app.sidebar-collapsed .side { width: 72px; padding-inline: 12px; }
+.app.sidebar-collapsed .main { grid-column: 2; }
+.app.sidebar-collapsed .logo img { width: 46px; max-width: none; object-fit: cover; object-position: left; }
+.app.sidebar-collapsed .profile { padding-block: 12px; margin-inline: 0; text-align: center; }
+.app.sidebar-collapsed .profile > :not(.profile-photo),
+.app.sidebar-collapsed .nav button span,
+.app.sidebar-collapsed .foot button span { display: none; }
+.app.sidebar-collapsed .nav button,
+.app.sidebar-collapsed .foot button { justify-content: center; padding-inline: 0; }
+.app.sidebar-collapsed .sidebar-collapse .ui-icon { transform: rotate(180deg); }
+.settings-button { display: flex; align-items: center; gap: 9px; width: 100%; }
+.profile-photo { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; float: left; margin: 0 10px 10px 0; }
+.foot .footer-profile { margin: 0 0 10px; padding: 0 4px 14px; border-top: 0; border-bottom: 1px solid var(--line); min-height: 54px; }
+.foot .footer-profile::after { content: ""; display: block; clear: both; }
+.foot .footer-profile strong { margin-top: 4px; }
+.foot .footer-profile .profile-photo { margin-bottom: 0; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.semantic-positive { color: var(--green) !important; background: color-mix(in srgb,var(--green) 10%,transparent); border-radius: 999px; padding: 4px 7px; }
+.semantic-warning { color: var(--amber) !important; background: color-mix(in srgb,var(--amber) 11%,transparent); border-radius: 999px; padding: 4px 7px; }
+.semantic-neutral { color: var(--blue) !important; background: var(--bluewash); border-radius: 999px; padding: 4px 7px; }
+.card-interactive,
+.interactive-row { transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease; cursor: pointer; }
+.card-interactive:hover,
+.interactive-row:hover { border-color: color-mix(in srgb,var(--blue) 42%,var(--line)); box-shadow: 0 8px 24px color-mix(in srgb,var(--blue) 8%,transparent); }
+.project-cover { position: relative; height: 174px; overflow: hidden; border-bottom: 1px solid var(--line); }
+.project-cover img { width: 100%; height: 100%; object-fit: cover; }
+.project-cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg,rgba(3,8,18,.82),rgba(3,8,18,.06)); }
+.project-cover > div { position: absolute; z-index: 2; inset: auto auto 22px 22px; color: #fff; }
+.project-cover .eyebrow { color: #8fc7ff; }
+.project-cover strong { display: block; margin: 5px 0 2px; font-size: 20px; }
+.project-cover small { font-size: 12px; color: rgba(255,255,255,.72); }
+.settings-profile { display: grid; grid-template-columns: 50px 1fr auto; gap: 12px; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--line); }
+.settings-profile img { width: 50px; height: 50px; object-fit: cover; border-radius: 50%; }
+.settings-profile strong,.settings-row strong { display: block; font-size: 14px; }
+.settings-profile span,.settings-row small { color: var(--muted); font-size: 12px; }
+.settings-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.settings-row > div { display: flex; align-items: center; gap: 11px; }
+.settings-row > div > .ui-icon { color: var(--blue); }
+
+/* Sidebar retrátil e mídia no portal do cliente */
+.app.sidebar-collapsed .sidebar { width: 72px; padding-inline: 12px; }
+.app.sidebar-collapsed .sidebar .brand-logo { width: 46px; height: 34px; object-fit: cover; object-position: left; }
+.app.sidebar-collapsed .sidebar .project-id { margin-inline: 0; padding-top: 14px; text-align: center; }
+.app.sidebar-collapsed .sidebar .project-id > * { display: none; }
+.app.sidebar-collapsed .side-nav .nav-btn { justify-content: center; gap: 0; padding-inline: 0; font-size: 0; }
+.app.sidebar-collapsed .side-foot .theme { justify-content: center; gap: 0; padding-inline: 0; font-size: 0; }
+.app.sidebar-collapsed .sidebar-collapse .ui-icon { transform: rotate(180deg); }
+.client-project-visual { grid-column: 1 / -1; position: relative; height: 92px; overflow: hidden; border-radius: 10px; border: 1px solid var(--line); }
+.client-project-visual img { width: 100%; height: 100%; object-fit: cover; }
+.client-project-visual::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg,rgba(3,8,18,.52),transparent); }
+.client-project-visual span { position: absolute; z-index: 2; left: 12px; bottom: 10px; color: #fff; font-size: 11px; font-weight: 700; }
+.person .avatar { overflow: hidden; }
+.person .avatar img { display: block; }
+.side-foot .client-user-profile { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 2px 2px 14px; border-bottom: 1px solid var(--line); }
+.client-user-profile .profile-photo { float: none; flex: 0 0 38px; margin: 0; }
+.client-user-profile strong { display: block; margin: 3px 0 2px; font-size: 13px; }
+.client-user-profile small { display: block; color: var(--muted); font-size: 11px; line-height: 1.35; }
+.app.sidebar-collapsed .client-user-profile { justify-content: center; padding-inline: 0; }
+.app.sidebar-collapsed .client-user-profile > div { display: none; }
+.person-actions button { width: 32px; height: 32px; display: inline-grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--muted); cursor: pointer; }
+.person-actions button:hover { color: var(--blue); border-color: color-mix(in srgb,var(--blue) 45%,var(--line)); }
+.person-actions .ui-icon { width: 15px; height: 15px; }
+
+@media (max-width: 900px) {
+  .sidebar-collapse { display: none; }
+  .app.sidebar-collapsed { display: block; }
+  .app.sidebar-collapsed .side { width: 224px; }
+  .app.sidebar-collapsed .profile > :not(.profile-photo),
+  .app.sidebar-collapsed .nav button span,
+  .app.sidebar-collapsed .foot button span { display: initial; }
+  .app.sidebar-collapsed .nav button,
+  .app.sidebar-collapsed .foot button { justify-content: flex-start; padding-inline: 10px; }
+  .app.sidebar-collapsed .sidebar { width: 224px; padding-inline: 16px; }
+  .app.sidebar-collapsed .sidebar .brand-logo { width: 145px; height: auto; object-fit: contain; }
+  .app.sidebar-collapsed .sidebar .project-id > * { display: initial; }
+  .app.sidebar-collapsed .client-user-profile { justify-content: flex-start; padding-inline: 2px; }
+  .app.sidebar-collapsed .client-user-profile > div { display: block; }
+  .app.sidebar-collapsed .side-nav .nav-btn,
+  .app.sidebar-collapsed .side-foot .theme { justify-content: flex-start; gap: 10px; padding-inline: 10px; font-size: 12px; }
+}
+
+/* Portal do cliente — mesma escala e densidade dos demais perfis */
+.project-id span,
+.desc,
+.head-meta span,
+.workspace-title p,
+.attention,
+.activity p,
+.owner,
+.due,
+.agenda-row span,
+.section-head p,
+.material p,
+.material span,
+.person p,
+.drawer-section p,
+.history,
+.related span,
+.feedback textarea,
+.check { font-size: 12px; }
+
+.project-id strong,
+.activity h3,
+.material h3,
+.person h3,
+.related strong,
+.agenda-row strong { font-size: 14px; }
+
+.workspace-title h2,
+.section-head h2,
+.group h2,
+.contact-grid h2,
+.drawer-section h3 { font-size: 16px; }
+
+.micro,
+.kicker,
+.badge,
+.state,
+.mini-label,
+.view-chip,
+.tool-btn,
+.clear,
+.groupby,
+.groupby select,
+.group-head span,
+.action,
+.primary,
+.prop small,
+.prop strong { font-size: 11px; }
+
+.group-head strong { font-size: 14px; }
+.stat strong { font-size: 24px; }
+.stat span { font-size: 12px; }
+.client { font-size: 14px; }
+.view-chip { padding: 9px 12px; }
+.activity { padding-block: 15px; }
+.material { padding-block: 15px; }
+.toolbar { padding: 9px; }
+.searchbox input { font-size: 12px; }
+.select { font-size: 11px; }
+
+@media (max-width: 560px) {
+  .activity h3,
+  .material h3,
+  .person h3 { font-size: 14px; }
+  .activity p,
+  .owner,
+  .due,
+  .material p,
+  .material span { font-size: 12px; }
+}
+
+/* Camada final de consistência — deve permanecer por último */
+.side > .logo,
+.sidebar > .brand { height:44px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.side > .logo img,
+.sidebar > .brand .brand-logo { flex:0 1 auto; max-width:145px; }
+.side > .logo .sidebar-collapse,
+.sidebar > .brand .sidebar-collapse { position:static; inset:auto; flex:0 0 28px; width:28px; height:28px; border:1px solid var(--line); border-radius:8px; background:var(--surface); box-shadow:none; }
+.side > .logo .sidebar-collapse:hover,
+.sidebar > .brand .sidebar-collapse:hover { background:var(--surface2); }
+.legacy-footer-action { display: none !important; }
+.foot, .side-foot { position: relative; }
+.foot .footer-profile,
+.side-foot .client-user-profile { display:grid; grid-template-columns:30px minmax(0,1fr) 14px; align-items:center; gap:9px; min-height:46px; margin:0; padding:8px 7px; border:0; border-radius:9px; cursor:pointer; text-align:left; }
+.foot .footer-profile:hover,
+.side-foot .client-user-profile:hover { background:var(--surface2); }
+.foot .footer-profile .profile-photo,
+.side-foot .client-user-profile .profile-photo { width:30px; height:30px; margin:0; float:none; }
+.foot .footer-profile .eyebrow,
+.client-user-profile .micro { display:none; }
+.foot .footer-profile strong,
+.client-user-profile strong { display:block; margin:0; font-size:12px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.foot .footer-profile > div > span:not(.eyebrow),
+.client-user-profile small { display:block; margin:1px 0 0; color:var(--muted); font-size:11px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.profile-chevron .ui-icon { width:12px; height:12px; transform:rotate(-90deg); }
+.account-menu { position:absolute; left:4px; right:4px; bottom:54px; z-index:60; padding:6px; border:1px solid var(--line); border-radius:12px; background:var(--surface); box-shadow:0 16px 44px rgba(0,0,0,.18); }
+.account-menu button { display:grid !important; grid-template-columns:18px 1fr; align-items:center; gap:10px !important; width:100%; padding:9px !important; border:0; border-radius:8px; background:none; color:var(--ink); text-align:left; cursor:pointer; }
+.account-menu button:hover { background:var(--surface2); }
+.account-menu button > span { display:block !important; }
+.account-menu strong { display:block; margin:0; font-size:12px; }
+.account-menu small { display:block; color:var(--muted); font-size:11px; }
+.account-menu .ui-icon { color:var(--muted); }
+.client-project-visual { display:none !important; }
+.timer-modal footer .modal-close { font-size:12px; }
+.info-summary { padding:15px; border:1px solid var(--line); border-radius:10px; background:var(--bg); }
+.info-summary strong { display:block; font-size:14px; }
+.info-summary p { margin:5px 0 0; color:var(--muted); font-size:12px; }
+.page-head h1 { font-size:clamp(30px,3vw,40px); line-height:1.05; }
+.project-head h1 { font-size:clamp(36px,4vw,46px); line-height:1; }
+.page-title { font-size:clamp(30px,3vw,40px); }
+.section-head h2, .workspace-title h2, .panel-head h2, .panel h2 { font-size:16px; }
+.card-interactive:focus-visible, .interactive-row:focus-visible { outline:2px solid var(--blue); outline-offset:-2px; }
+tbody tr.card-interactive:hover, .feed-item.card-interactive:hover { background:var(--hover,var(--surface2)); }
+.app.sidebar-collapsed .footer-profile { grid-template-columns:30px; justify-content:center; padding-inline:0; }
+.app.sidebar-collapsed .footer-profile > :not(.profile-photo) { display:none !important; }
+.app.sidebar-collapsed .side > .logo,
+.app.sidebar-collapsed .sidebar > .brand { justify-content:center; }
+.app.sidebar-collapsed .side > .logo img,
+.app.sidebar-collapsed .sidebar > .brand .brand-logo { display:none !important; }
+@media (max-width:900px) {
+  .app.sidebar-collapsed .footer-profile { grid-template-columns:30px minmax(0,1fr) 14px; justify-content:initial; padding-inline:7px; }
+  .app.sidebar-collapsed .footer-profile > :not(.profile-photo) { display:block !important; }
+  .app.sidebar-collapsed .side > .logo,
+  .app.sidebar-collapsed .sidebar > .brand { justify-content:space-between; }
+  .app.sidebar-collapsed .side > .logo img.logo-light,
+  .app.sidebar-collapsed .sidebar > .brand .brand-logo.logo-light { display:block !important; }
+  html[data-theme="dark"] .app.sidebar-collapsed .side > .logo img.logo-light,
+  html[data-theme="dark"] .app.sidebar-collapsed .sidebar > .brand .brand-logo.logo-light { display:none !important; }
+  html[data-theme="dark"] .app.sidebar-collapsed .side > .logo img.logo-dark,
+  html[data-theme="dark"] .app.sidebar-collapsed .sidebar > .brand .brand-logo.logo-dark { display:block !important; }
+}
