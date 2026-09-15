@@ -1,0 +1,625 @@
+// Portal 3ADS EDU — modelo de dados
+//
+// Implementa docs/05-modelo-de-dados.md. Os estados seguem as máquinas
+// definidas lá; as regras de integridade que o Prisma não expressa
+// (constraints CHECK e índice parcial do timer) são aplicadas por SQL na
+// migração — ver prisma/migrations.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enumerações
+// ---------------------------------------------------------------------------
+
+enum UserStatus {
+  invited
+  active
+  blocked
+}
+
+enum OrganizationType {
+  agency // a própria 3ADS
+  client
+  partner
+}
+
+enum OrganizationStatus {
+  active
+  inactive
+}
+
+/// Perfis de docs/14-matriz-permissoes.md. `client_focal` e `client_learner`
+/// são papéis do mesmo perfil de cliente — ver D-005 em docs/12.
+enum MemberRole {
+  admin
+  ops
+  trainer
+  client_focal
+  client_learner
+}
+
+enum ProjectType {
+  training
+  consulting
+  mentoring
+  lecture
+  hybrid
+}
+
+enum ProjectFormat {
+  online
+  in_person
+  hybrid
+}
+
+enum ProjectStatus {
+  draft
+  active
+  paused
+  completed
+  cancelled
+  archived
+}
+
+enum ActivityStatus {
+  not_started
+  in_progress
+  waiting_client
+  waiting_3ads
+  blocked
+  completed
+  cancelled
+}
+
+enum ActivityPriority {
+  low
+  medium
+  high
+}
+
+enum TimeEntryType {
+  class_hour
+  preparation
+  meeting
+  material_production
+  backoffice
+}
+
+enum TimeEntryStatus {
+  running
+  submitted
+  approved
+  rejected
+}
+
+enum TimeEntrySource {
+  timer
+  manual
+}
+
+enum UpdateType {
+  note
+  class_report
+  decision
+  alert
+}
+
+/// `internal` é visível apenas para a equipe 3ADS e o professor;
+/// `published` alcança o cliente.
+enum UpdateVisibility {
+  internal
+  published
+}
+
+enum MaterialKind {
+  document
+  image
+  video
+  link
+}
+
+enum MaterialStatus {
+  private
+  in_review
+  published
+  archived
+}
+
+enum NoticeAudience {
+  all
+  trainers
+  clients
+  project
+}
+
+enum NoticeStatus {
+  draft
+  scheduled
+  published
+  expired
+}
+
+enum FeedbackTarget {
+  project
+  agency
+}
+
+enum FeedbackStatus {
+  new
+  triaged
+  assigned
+  resolved
+}
+
+// ---------------------------------------------------------------------------
+// Identidade
+// ---------------------------------------------------------------------------
+
+model User {
+  id        String     @id @default(uuid()) @db.Uuid
+  name      String
+  email     String     @unique
+  avatarUrl String?    @map("avatar_url")
+  status    UserStatus @default(invited)
+
+  /// Verdadeiro para a equipe interna da 3ADS. Define o caminho de entrada
+  /// (SSO em vez de link mágico) — ver D-001 em docs/12.
+  isInternal Boolean @default(false) @map("is_internal")
+
+  /// Concedido apenas ao Admin geral: escopo global, sem passar por
+  /// ProjectMember.
+  isSuperAdmin Boolean @default(false) @map("is_super_admin")
+
+  organizationId String?       @map("organization_id") @db.Uuid
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  /// Registrado quando o titular exerce o direito de exclusão. O histórico
+  /// produzido permanece, agora sem identificar a pessoa — ver docs/15.
+  anonymizedAt DateTime? @map("anonymized_at")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  lastSeenAt DateTime? @map("last_seen_at")
+
+  accounts       Account[]
+  sessions       Session[]
+  memberships    ProjectMember[]
+  createdProjects Project[]      @relation("ProjectCreatedBy")
+  focalOf        Project[]       @relation("ProjectClientFocal")
+  ownedActivities Activity[]     @relation("ActivityOwner")
+  createdActivities Activity[]   @relation("ActivityCreatedBy")
+  timeEntries    TimeEntry[]     @relation("TimeEntryUser")
+  approvedEntries TimeEntry[]    @relation("TimeEntryApprover")
+  updates        Update[]
+  materials      Material[]
+  notices        Notice[]
+  feedbacks      Feedback[]      @relation("FeedbackAuthor")
+  assignedFeedbacks Feedback[]   @relation("FeedbackAssignee")
+  auditLogs      AuditLog[]
+  invitesSent    Invite[]        @relation("InviteCreatedBy")
+
+  @@index([email])
+  @@index([status])
+  @@map("users")
+}
+
+model Organization {
+  id       String             @id @default(uuid()) @db.Uuid
+  name     String
+  type     OrganizationType
+  document String?
+  status   OrganizationStatus @default(active)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users    User[]
+  projects Project[]
+
+  @@index([type])
+  @@map("organizations")
+}
+
+// ---------------------------------------------------------------------------
+// Autenticação (Auth.js)
+// ---------------------------------------------------------------------------
+
+model Account {
+  id                String  @id @default(uuid()) @db.Uuid
+  userId            String  @map("user_id") @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id") @db.Uuid
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+/// Token de uso único do link mágico e do convite. Ambos usam o mesmo
+/// mecanismo — ver D-001 em docs/12.
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+/// Convite pendente. Guarda o perfil e os projetos que a pessoa receberá ao
+/// aceitar, para que a autorização já nasça correta.
+model Invite {
+  id          String     @id @default(uuid()) @db.Uuid
+  email       String
+  name        String?
+  role        MemberRole
+  permissions String[]   @default([])
+
+  /// Projetos aos quais a pessoa será vinculada ao aceitar.
+  projectIds String[] @default([]) @map("project_ids")
+
+  createdById String @map("created_by") @db.Uuid
+  createdBy   User   @relation("InviteCreatedBy", fields: [createdById], references: [id])
+
+  expiresAt  DateTime  @map("expires_at")
+  acceptedAt DateTime? @map("accepted_at")
+  revokedAt  DateTime? @map("revoked_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([email])
+  @@index([expiresAt])
+  @@map("invites")
+}
+
+// ---------------------------------------------------------------------------
+// Projetos
+// ---------------------------------------------------------------------------
+
+model Project {
+  id                   String  @id @default(uuid()) @db.Uuid
+  clientOrganizationId String  @map("client_organization_id") @db.Uuid
+  clientOrganization   Organization @relation(fields: [clientOrganizationId], references: [id])
+
+  name         String
+  type         ProjectType
+  format       ProjectFormat
+  description  String?
+  scope        String?
+  objectives   String?
+  deliverables String?
+  notes        String?
+
+  plannedHours Decimal  @default(0) @map("planned_hours") @db.Decimal(8, 2)
+  startDate    DateTime? @map("start_date") @db.Date
+  endDate      DateTime? @map("end_date") @db.Date
+
+  status       ProjectStatus @default(draft)
+  currentStage String?       @map("current_stage")
+
+  clientFocalUserId String? @map("client_focal_user_id") @db.Uuid
+  clientFocalUser   User?   @relation("ProjectClientFocal", fields: [clientFocalUserId], references: [id], onDelete: SetNull)
+
+  createdById String @map("created_by") @db.Uuid
+  createdBy   User   @relation("ProjectCreatedBy", fields: [createdById], references: [id])
+
+  completedAt DateTime? @map("completed_at")
+  archivedAt  DateTime? @map("archived_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  members    ProjectMember[]
+  stages     Stage[]
+  activities Activity[]
+  timeEntries TimeEntry[]
+  updates    Update[]
+  materials  Material[]
+  notices    Notice[]
+  feedbacks  Feedback[]
+
+  @@index([status])
+  @@index([clientOrganizationId])
+  @@map("projects")
+}
+
+/// Vínculo entre usuário e projeto. É a unidade de escopo da autorização:
+/// sem um vínculo ativo aqui, o projeto não existe para o usuário.
+model ProjectMember {
+  id        String @id @default(uuid()) @db.Uuid
+  projectId String @map("project_id") @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String @map("user_id") @db.Uuid
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role MemberRole
+
+  /// Permissões concedidas neste projeto, além do conjunto padrão do perfil.
+  /// Ver "Conjuntos por perfil" em docs/14.
+  permissions String[] @default([])
+
+  responsibility String?
+  joinedAt       DateTime  @default(now()) @map("joined_at")
+  removedAt      DateTime? @map("removed_at")
+
+  @@unique([projectId, userId])
+  @@index([userId, removedAt])
+  @@map("project_members")
+}
+
+model Stage {
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @map("project_id") @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  name     String
+  position Int
+  startDate DateTime? @map("start_date") @db.Date
+  endDate   DateTime? @map("end_date") @db.Date
+
+  activities Activity[]
+
+  @@unique([projectId, position])
+  @@map("stages")
+}
+
+model Activity {
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @map("project_id") @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  stageId String? @map("stage_id") @db.Uuid
+  stage   Stage?  @relation(fields: [stageId], references: [id], onDelete: SetNull)
+
+  title       String
+  description String?
+  status      ActivityStatus   @default(not_started)
+  priority    ActivityPriority @default(medium)
+
+  ownerUserId String? @map("owner_user_id") @db.Uuid
+  owner       User?   @relation("ActivityOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+
+  dueAt       DateTime? @map("due_at")
+  completedAt DateTime? @map("completed_at")
+
+  createdById String @map("created_by") @db.Uuid
+  createdBy   User   @relation("ActivityCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  timeEntries TimeEntry[]
+  updates     Update[]
+  materials   Material[]
+
+  @@index([projectId, status])
+  @@index([ownerUserId])
+  @@map("activities")
+}
+
+// ---------------------------------------------------------------------------
+// Horas
+// ---------------------------------------------------------------------------
+
+model TimeEntry {
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @map("project_id") @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  activityId String?   @map("activity_id") @db.Uuid
+  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation("TimeEntryUser", fields: [userId], references: [id])
+
+  type        TimeEntryType
+  description String?
+  observation String?
+
+  startedAt       DateTime  @map("started_at")
+  endedAt         DateTime? @map("ended_at")
+  durationMinutes Int?      @map("duration_minutes")
+
+  source TimeEntrySource @default(manual)
+  status TimeEntryStatus @default(submitted)
+
+  approvedById String?   @map("approved_by") @db.Uuid
+  approvedBy   User?     @relation("TimeEntryApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt   DateTime? @map("approved_at")
+  rejectionReason String? @map("rejection_reason")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([projectId, status])
+  @@index([userId, startedAt])
+  @@map("time_entries")
+}
+
+// ---------------------------------------------------------------------------
+// Conteúdo
+// ---------------------------------------------------------------------------
+
+model Update {
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @map("project_id") @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  activityId String?   @map("activity_id") @db.Uuid
+  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+
+  authorUserId String @map("author_user_id") @db.Uuid
+  author       User   @relation(fields: [authorUserId], references: [id])
+
+  type        UpdateType       @default(note)
+  title       String
+  body        String
+  observation String?
+  visibility  UpdateVisibility @default(internal)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  materials Material[]
+
+  @@index([projectId, createdAt])
+  @@index([projectId, visibility])
+  @@map("updates")
+}
+
+model Material {
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @map("project_id") @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  activityId String?   @map("activity_id") @db.Uuid
+  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+
+  updateId String? @map("update_id") @db.Uuid
+  update   Update? @relation(fields: [updateId], references: [id], onDelete: SetNull)
+
+  uploadedById String @map("uploaded_by") @db.Uuid
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id])
+
+  name      String
+  kind      MaterialKind
+  mimeType  String?      @map("mime_type")
+  sizeBytes BigInt?      @map("size_bytes")
+
+  /// Chave no bucket. Nulo para material do tipo `link`.
+  storageKey String? @map("storage_key")
+  linkUrl    String? @map("link_url")
+
+  status       MaterialStatus @default(private)
+  downloadable Boolean        @default(true)
+
+  /// Resultado da varredura antivírus. Material só sai de `in_review`
+  /// depois de aprovado — ver D-003 em docs/12.
+  scanStatus String?   @default("pending") @map("scan_status")
+  publishedAt DateTime? @map("published_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([projectId, status])
+  @@map("materials")
+}
+
+model Notice {
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+  body  String
+
+  audienceType NoticeAudience @default(all) @map("audience_type")
+
+  projectId String?  @map("project_id") @db.Uuid
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  imageUrl String? @map("image_url")
+  linkUrl  String? @map("link_url")
+
+  publishAt DateTime? @map("publish_at")
+  expiresAt DateTime? @map("expires_at")
+  status    NoticeStatus @default(draft)
+
+  createdById String @map("created_by") @db.Uuid
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status, publishAt])
+  @@map("notices")
+}
+
+model Feedback {
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @map("project_id") @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  /// Preservado mesmo quando `anonymous` é verdadeiro: a LGPD exige poder
+  /// atender pedido de exclusão, e sem isso não há como conter abuso.
+  /// A leitura oculta a autoria — ver D-006 em docs/12.
+  authorUserId String @map("author_user_id") @db.Uuid
+  author       User   @relation("FeedbackAuthor", fields: [authorUserId], references: [id])
+
+  audienceRole MemberRole     @map("audience_role")
+  target       FeedbackTarget @default(project)
+
+  score     Int?
+  message   String?
+  anonymous Boolean @default(false)
+
+  status FeedbackStatus @default(new)
+  topic  String?
+
+  assignedToId String? @map("assigned_to") @db.Uuid
+  assignedTo   User?   @relation("FeedbackAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  resolution String?
+  resolvedAt DateTime? @map("resolved_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  @@index([projectId, status])
+  @@index([status, createdAt])
+  @@map("feedbacks")
+}
+
+// ---------------------------------------------------------------------------
+// Auditoria
+// ---------------------------------------------------------------------------
+
+/// Registro imutável. A migração revoga UPDATE e DELETE — ver docs/15.
+model AuditLog {
+  id String @id @default(uuid()) @db.Uuid
+
+  actorUserId String? @map("actor_user_id") @db.Uuid
+  actor       User?   @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  action     String
+  entityType String  @map("entity_type")
+  entityId   String? @map("entity_id")
+
+  before Json?
+  after  Json?
+
+  /// Endereço nunca é armazenado em claro: o hash permite correlacionar
+  /// tentativas sem guardar o dado pessoal.
+  ipHash    String? @map("ip_hash")
+  userAgent String? @map("user_agent")
+  context   Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([actorUserId, createdAt])
+  @@index([entityType, entityId])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}

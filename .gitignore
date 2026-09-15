@@ -4,10 +4,15 @@ node_modules/
 .pnp.js
 
 # Build
+.next/
 dist/
 build/
-.next/
 out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma — client gerado, recriado por `npm run db:generate`
+src/generated/
 
 # Ambiente
 .env

@@ -7,13 +7,37 @@
   "scripts": {
     "verify:tokens": "node design/verify-tokens.mjs",
     "test:prototype": "node tests/prototype-a11y.mjs",
-    "verify": "npm run verify:tokens && npm run test:prototype",
-    "serve": "npx --yes serve outputs"
+    "verify": "npm run typecheck && npm run verify:tokens && npm run test:prototype && npm run test:authz && npm run test:e2e",
+    "serve": "npx --yes serve outputs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:seed": "tsx prisma/seed.ts",
+    "test:authz": "NODE_ENV=test node --env-file=.env --import tsx --test tests/server/authorization.test.ts",
+    "test:e2e": "bash scripts/test-e2e.sh"
   },
   "devDependencies": {
-    "playwright": "^1.49.0"
+    "@types/node": "^26.5.1",
+    "dotenv": "^17.4.2",
+    "playwright": "^1.49.0",
+    "prisma": "^7.10.0",
+    "tsx": "^4.23.13",
+    "typescript": "^5.7.3"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.3",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "next": "^15.5.25",
+    "next-auth": "^5.0.0-beta.32",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^4.6.5"
   }
 }

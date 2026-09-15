@@ -50,6 +50,10 @@ O repositório contém um protótipo navegável em HTML, CSS e JavaScript. Ele d
 15. [Retenção, privacidade e auditoria](docs/15-retencao-e-privacidade.md)
 16. [Roteiro de validação do protótipo](docs/16-roteiro-de-validacao.md)
 
+### Fase 1 — construção
+
+17. [Aplicação](docs/17-aplicacao.md)
+
 ### Operação
 
 8. [Roadmap para produção](docs/08-roadmap-para-producao.md)
@@ -66,7 +70,14 @@ O repositório contém um protótipo navegável em HTML, CSS e JavaScript. Ele d
 | Transformar identidade visual em tokens | Concluído — [doc 11](docs/11-tokens-de-design.md), `design/` |
 | Revisar protótipo com os três perfis | Roteiro pronto, sessões a realizar — [doc 16](docs/16-roteiro-de-validacao.md) |
 
-Cinco decisões continuam marcadas como “Proposto” no [doc 12](docs/12-decisoes-tecnicas.md) e dependem de confirmação da 3ADS. Nenhuma impede o início da Fase 1.
+Cinco decisões continuam marcadas como “Proposto” no [doc 12](docs/12-decisoes-tecnicas.md) e dependem de confirmação da 3ADS.
+
+## Estado da Fase 1
+
+| Etapa | Situação |
+|---|---|
+| E1 · Acesso e identidade | Concluída — [doc 17](docs/17-aplicacao.md) |
+| E2 a E12 | A construir, na ordem do [doc 13](docs/13-escopo-v1.md) |
 
 ## Execução local
 

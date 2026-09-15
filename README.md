@@ -22,18 +22,33 @@ Os arquivos podem ser abertos diretamente no navegador ou servidos com `npm run 
 
 A documentação completa começa em [`DOCUMENTACAO.md`](DOCUMENTACAO.md). Ela inclui produto, permissões, fluxos, arquitetura, dados, UX, testes, roadmap, guia de uso e contrato inicial de API, além dos entregáveis da Fase 0: tokens de design, decisões técnicas, escopo da v1, matriz de permissões validada, política de retenção e roteiro de validação.
 
+## Desenvolvimento
+
+```
+service postgresql start
+cp .env.example .env     # preencher DATABASE_URL e AUTH_SECRET
+npm install
+npm run db:migrate
+npm run db:seed
+npm run dev
+```
+
 ## Verificação
 
 ```
-npm install
 npm run verify
 ```
 
-Confere o contraste da paleta contra WCAG AA, a sincronia dos tokens e o comportamento do protótipo nas cinco larguras exigidas pelo plano de testes.
+Encadeia typecheck, contraste da paleta contra WCAG AA, comportamento do protótipo nas cinco larguras do plano de testes, os testes de autorização contra banco real e os testes de ponta a ponta da API.
 
 ## Estado do projeto
 
-Este repositório contém um **protótipo front-end**, não uma aplicação pronta para produção. Os dados são demonstrativos e parte da persistência usa `localStorage`.
+O repositório contém duas coisas:
+
+- **a aplicação** em construção (Next.js, Prisma, PostgreSQL), com a etapa de acesso e identidade concluída — ver [`docs/17-aplicacao.md`](docs/17-aplicacao.md);
+- **o protótipo** navegável em `outputs/`, mantido como referência visual e de fluxo.
+
+O protótipo usa dados demonstrativos e `localStorage`; não é a aplicação.
 
 A versão produtiva ainda precisará de backend, banco de dados, autenticação, autorização no servidor, armazenamento de arquivos, auditoria, testes automatizados e infraestrutura.
 

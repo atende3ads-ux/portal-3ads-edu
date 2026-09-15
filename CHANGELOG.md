@@ -1,5 +1,50 @@
 # Registro de mudanças
 
+## 2026-09-15 · Fase 1 · E1 · Acesso e identidade
+
+### Aplicação
+
+Primeira entrega de código da versão produtiva, na stack decidida em `docs/12`:
+Next.js 15 com App Router, Prisma 7 sobre PostgreSQL 16 e Auth.js v5.
+
+- **modelo de dados** completo do `docs/05`: 11 entidades, Auth.js e convites,
+  com as máquinas de estado de projeto, atividade, material e horas;
+- **regras de integridade no banco**, não na aplicação: índice parcial que
+  garante um único timer ativo por usuário, constraints de período, horas e
+  NPS, e gatilho que torna a trilha de auditoria imutável;
+- **camada de autorização** traduzindo `docs/14`: 22 permissões, conjuntos por
+  perfil, verificação de capacidade e de escopo, e recorte de leitura aplicado
+  no banco;
+- **autenticação sem senha**: SSO restrito ao domínio para a equipe e link
+  mágico de 15 minutos para professores e clientes; ninguém se cadastra
+  sozinho, o acesso nasce de convite;
+- **trilha de auditoria** com hash de IP, remoção de segredos e registro
+  automático de toda negativa de autorização;
+- **rotas** `/api/v1/me`, `/api/v1/projects` e `/api/v1/projects/{id}`
+  conforme o contrato do `docs/10`.
+
+### Critério de pronto do E1
+
+Um professor autenticado que acessa projeto alheio recebe **404**, não 403 —
+403 confirmaria a existência do projeto — e a tentativa fica registrada em
+`AuditLog` com hash do IP. Verificado por HTTP, com servidor e sessão reais.
+
+### Defeito encontrado durante a construção
+
+A rota `/me` listava os vínculos direto de `ProjectMember`, sem passar pela
+regra de visibilidade, e devolvia ao professor um projeto em rascunho que ele
+não deveria enxergar. O teste de ponta a ponta pegou; o da camada, não.
+
+### Verificação
+
+`npm run verify` encadeia typecheck, tokens, protótipo, autorização e ponta a
+ponta: **144 verificações**, todas passando. Os testes de autorização rodam
+contra banco real e foram submetidos a teste de mutação.
+
+### Documentação
+
+- `docs/17-aplicacao.md`: estrutura, decisões de implementação e o que falta.
+
 ## 2026-09-15 · Fase 0
 
 ### Visão do produto
